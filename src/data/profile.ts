@@ -214,7 +214,7 @@ export const experience = [
 
 export const skills = [
   { title: 'Languages', items: ['PHP', 'TypeScript', 'JavaScript', 'SQL', 'HTML', 'CSS'] },
-  { title: 'Frameworks & Platforms', items: ['Laravel', 'Vue.js', 'Node.js', 'WordPress', 'WooCommerce', 'Electron', 'CodeIgniter'] },
+  { title: 'Frameworks & Platforms', items: ['Laravel', 'Vue.js', 'React', 'Node.js', 'WordPress', 'WooCommerce', 'Electron', 'CodeIgniter'] },
   { title: 'Data', items: ['MySQL', 'PostgreSQL', 'SQLite', 'MongoDB', 'Redis', 'CouchDB'] },
   { title: 'Ways of working', items: ['Agile / Scrum', 'Git', 'Jira', 'ClickUp', 'DigitalOcean', 'Ubuntu'] },
 ];

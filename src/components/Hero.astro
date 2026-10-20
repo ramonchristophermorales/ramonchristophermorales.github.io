@@ -44,16 +44,25 @@ import { profile } from '../data/profile';
           format="webp"
         />
       </div>
-      <div class="float code" aria-hidden="true">
-        <span class="k">const</span> stack = [<br />
-        &nbsp;&nbsp;<span class="s">'Laravel'</span>, <span class="s">'Vue'</span>,<br />
-        &nbsp;&nbsp;<span class="s">'TypeScript'</span><br />
-        ];
-      </div>
       <div class="float loc">
         <Icon name="pin" size={14} />
         {profile.location}
       </div>
+
+    <div class="editor" aria-hidden="true">
+      <div class="editor-bar">
+        <span class="lights"><i></i><i></i><i></i></span>
+        <span class="file">ramon.ts</span>
+      </div>
+      <pre data-typewriter><code><span class="ln">1</span><span class="k">const</span> <span class="v">ramon</span> = &#123;
+<span class="ln">2</span>  <span class="p">role</span>: <span class="s">'Full-Stack Developer'</span>,
+<span class="ln">3</span>  <span class="p">stack</span>: [<span class="s">'Laravel'</span>, <span class="s">'Vue'</span>, <span class="s">'React'</span>, <span class="s">'TS'</span>],
+<span class="ln">4</span>  <span class="p">experience</span>: <span class="n">10</span>, <span class="c">// years</span>
+<span class="ln">5</span>  <span class="p">available</span>: <span class="n">true</span>,
+<span class="ln">6</span>&#125;;
+<span class="ln">7</span>
+<span class="ln">8</span><span class="v">ramon</span>.<span class="f">build</span>(<span class="s">'your next platform'</span>);</code></pre>
+    </div>
     </div>
   </div>
 
@@ -219,25 +228,115 @@ import { profile } from '../data/profile';
     box-shadow: var(--shadow-lg);
     border-radius: 14px;
   }
-  .code {
-    top: 3%;
-    left: -64px;
-    padding: 12px 16px;
+  /* Mini code editor: always dark, like a real IDE */
+  .editor {
+    position: absolute;
+    left: -88px;
+    bottom: -44px;
+    z-index: 2;
+    width: 380px;
+    border-radius: 14px;
+    border: 1px solid #26262c;
+    background: rgb(13 13 16 / 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow:
+      0 24px 48px -16px rgb(0 0 0 / 0.45),
+      0 0 0 1px rgb(255 255 255 / 0.03) inset;
+    overflow: hidden;
+    color: #d4d4d8;
+  }
+  .editor-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #1f1f24;
+    background: rgb(255 255 255 / 0.02);
+  }
+  .lights {
+    display: flex;
+    gap: 6px;
+  }
+  .lights i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #3f3f46;
+  }
+  .lights i:nth-child(1) {
+    background: #ff5f57;
+  }
+  .lights i:nth-child(2) {
+    background: #febc2e;
+  }
+  .lights i:nth-child(3) {
+    background: #28c840;
+  }
+  .file {
     font-family: var(--font-mono);
     font-size: 0.75rem;
-    line-height: 1.6;
-    color: var(--fg-muted);
-    animation: bob 6s ease-in-out infinite;
+    color: #a1a1aa;
   }
-  .code .k {
-    color: var(--accent-text);
+  .editor pre {
+    margin: 0;
+    padding: 14px 16px 16px 0;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.7;
+    white-space: pre;
+    overflow: hidden;
   }
-  .code .s {
-    color: var(--accent-2);
+  .editor .ln {
+    display: inline-block;
+    width: 34px;
+    padding-right: 14px;
+    text-align: right;
+    color: #52525b;
+    user-select: none;
+  }
+  .editor .k {
+    color: #c084fc;
+  }
+  .editor .v {
+    color: #f4f4f5;
+  }
+  .editor .p {
+    color: #93c5fd;
+  }
+  .editor .s {
+    color: #86efac;
+  }
+  .editor .n {
+    color: #fdba74;
+  }
+  .editor .c {
+    color: #71717a;
+    font-style: italic;
+  }
+  .editor .f {
+    color: #67e8f9;
+  }
+  .editor :global(.caret) {
+    display: inline-block;
+    width: 7px;
+    height: 1.1em;
+    margin-left: 1px;
+    vertical-align: -0.18em;
+    background: #a5b4fc;
+    animation: blink 1s steps(1) infinite;
+  }
+  .editor :global(.caret.is-typing) {
+    animation: none;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
   }
   .loc {
     right: -20px;
-    bottom: 36px;
+    top: 28px;
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -282,8 +381,12 @@ import { profile } from '../data/profile';
   }
 
   @media (max-width: 1100px) {
-    .code {
-      left: -24px;
+    .editor {
+      left: -40px;
+      width: 350px;
+    }
+    .editor pre {
+      font-size: 0.72rem;
     }
     .loc {
       right: -8px;
@@ -293,11 +396,29 @@ import { profile } from '../data/profile';
     .grid {
       grid-template-columns: 1fr;
     }
+    /* Portrait becomes a small avatar above the copy; the editor drops below the buttons. */
     .visual {
+      display: contents;
+    }
+    .portrait {
       justify-self: start;
-      max-width: 112px;
+      width: 112px;
       order: -1;
       margin-bottom: -8px;
+    }
+    .editor {
+      position: relative;
+      left: auto;
+      bottom: auto;
+      width: 100%;
+      max-width: 460px;
+    }
+    .editor pre {
+      font-size: 0.7rem;
+    }
+    .editor .ln {
+      width: 28px;
+      padding-right: 10px;
     }
     .portrait {
       aspect-ratio: 1;

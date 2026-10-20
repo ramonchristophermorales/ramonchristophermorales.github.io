@@ -1,12 +1,12 @@
 ---
 import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
-import portrait from '../assets/img/portrait.jpg';
+import portrait from '../assets/img/portrait.png';
 import { profile } from '../data/profile';
 ---
 
 <section class="hero" id="top">
-  <div class="glow" aria-hidden="true"></div>
+  <div class="backdrop" aria-hidden="true"></div>
   <div class="container grid">
     <div class="copy">
       <p class="status" data-reveal>
@@ -14,42 +14,50 @@ import { profile } from '../data/profile';
         {profile.availability}
       </p>
       <h1 data-reveal style="--delay: 60ms">
-        {profile.role.split(' ').slice(0, -1).join(' ')}{' '}
-        <span class="serif accent">{profile.role.split(' ').at(-1)}</span>
-        <span class="sub">Laravel · Vue · TypeScript</span>
+        Full-stack developer building <span class="grad">reliable web platforms</span>
       </h1>
       <p class="lede" data-reveal style="--delay: 120ms">{profile.intro}</p>
       <div class="ctas" data-reveal style="--delay: 180ms">
         <a href="#work" class="btn btn-primary">
-          See selected work <Icon name="arrow-down" />
+          View selected work <Icon name="arrow-right" />
         </a>
         <a href={profile.links.resume} class="btn" target="_blank" rel="noopener">
           <Icon name="file" /> Résumé
         </a>
-        <a href={profile.links.linkedin} class="btn btn-icon" target="_blank" rel="noopener" aria-label="LinkedIn">
-          <Icon name="linkedin" />
-        </a>
-        <a href={profile.links.github} class="btn btn-icon" target="_blank" rel="noopener" aria-label="GitHub">
-          <Icon name="github" />
-        </a>
+        <div class="socials">
+          <a href={profile.links.linkedin} class="btn btn-icon" target="_blank" rel="noopener" aria-label="LinkedIn">
+            <Icon name="linkedin" />
+          </a>
+          <a href={profile.links.github} class="btn btn-icon" target="_blank" rel="noopener" aria-label="GitHub">
+            <Icon name="github" />
+          </a>
+        </div>
       </div>
     </div>
 
-    <figure class="portrait" data-reveal style="--delay: 120ms">
-      <Image
-        src={portrait}
-        alt={`Portrait of ${profile.name}`}
-        widths={[360, 560, 800]}
-        sizes="(max-width: 860px) 70vw, 400px"
-        loading="eager"
-        fetchpriority="high"
-        format="avif"
-      />
-      <figcaption>
-        <strong>{profile.name}</strong>
-        <span><Icon name="pin" size={14} /> {profile.location}</span>
-      </figcaption>
-    </figure>
+    <div class="visual" data-reveal style="--delay: 120ms">
+      <div class="portrait">
+        <Image
+          src={portrait}
+          alt={`Illustrated portrait of ${profile.name}`}
+          widths={[360, 540, 720]}
+          sizes="(max-width: 900px) 112px, 420px"
+          loading="eager"
+          fetchpriority="high"
+          format="webp"
+        />
+      </div>
+      <div class="float code" aria-hidden="true">
+        <span class="k">const</span> stack = [<br />
+        &nbsp;&nbsp;<span class="s">'Laravel'</span>, <span class="s">'Vue'</span>,<br />
+        &nbsp;&nbsp;<span class="s">'TypeScript'</span><br />
+        ];
+      </div>
+      <div class="float loc">
+        <Icon name="pin" size={14} />
+        {profile.location}
+      </div>
+    </div>
   </div>
 
   <div class="container">
@@ -58,13 +66,13 @@ import { profile } from '../data/profile';
         profile.stats.map((s) => (
           <div>
             <dt>{s.label}</dt>
-            <dd class="serif">{s.value}</dd>
+            <dd>{s.value}</dd>
           </div>
         ))
       }
       <div>
-        <dt>Certified ScrumMaster® & Product Owner</dt>
-        <dd class="serif">CSM · CSPO</dd>
+        <dt>Certified ScrumMaster® &amp; Product Owner</dt>
+        <dd>CSM · CSPO</dd>
       </div>
     </dl>
   </div>
@@ -73,35 +81,47 @@ import { profile } from '../data/profile';
 <style>
   .hero {
     position: relative;
-    padding-top: clamp(40px, 7vw, 96px);
-    padding-bottom: clamp(56px, 8vw, 96px);
+    padding-top: clamp(48px, 7vw, 96px);
+    padding-bottom: clamp(48px, 7vw, 80px);
     isolation: isolate;
+    overflow: hidden;
   }
-  .glow {
+  .backdrop {
     position: absolute;
-    inset: -120px 0 auto 0;
-    height: 720px;
+    inset: -68px 0 0;
     z-index: -1;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(70% 60% at 50% 30%, #000 40%, transparent 100%);
+    -webkit-mask-image: radial-gradient(70% 60% at 50% 30%, #000 40%, transparent 100%);
+  }
+  .backdrop::after {
+    content: '';
+    position: absolute;
+    inset: 0;
     background:
-      radial-gradient(40% 50% at 78% 30%, color-mix(in oklab, var(--accent) 18%, transparent), transparent 70%),
-      radial-gradient(30% 40% at 12% 10%, color-mix(in oklab, var(--accent) 10%, transparent), transparent 70%);
-    pointer-events: none;
+      radial-gradient(35% 40% at 80% 35%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 70%),
+      radial-gradient(30% 35% at 95% 70%, color-mix(in oklab, var(--accent-2) 12%, transparent), transparent 70%);
   }
   .grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr);
-    gap: clamp(32px, 6vw, 80px);
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.9fr);
+    gap: clamp(32px, 6vw, 72px);
     align-items: center;
   }
   .status {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    padding: 6px 14px 6px 10px;
+    padding: 5px 12px 5px 10px;
     border: 1px solid var(--border);
     border-radius: 999px;
     background: var(--bg-elev);
+    box-shadow: var(--shadow);
     font-size: 0.8125rem;
+    font-weight: 500;
     color: var(--fg-muted);
     margin-bottom: 28px;
   }
@@ -110,14 +130,14 @@ import { profile } from '../data/profile';
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #22a06b;
+    background: #10b981;
   }
   .dot::after {
     content: '';
     position: absolute;
     inset: -4px;
     border-radius: 50%;
-    background: #22a06b;
+    background: #10b981;
     opacity: 0.35;
     animation: pulse 2.4s var(--ease) infinite;
   }
@@ -132,27 +152,15 @@ import { profile } from '../data/profile';
     }
   }
   h1 {
-    font-size: clamp(2.75rem, 7.2vw, 5.5rem);
-    line-height: 0.98;
-    letter-spacing: -0.035em;
-  }
-  .accent {
-    font-style: italic;
-    color: var(--accent);
-    font-size: 1.08em;
-  }
-  .sub {
-    display: block;
-    margin-top: 18px;
-    font-size: clamp(1rem, 1.6vw, 1.25rem);
-    font-weight: 500;
-    letter-spacing: 0;
-    color: var(--fg-muted);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+    max-width: 14ch;
   }
   .lede {
     margin-top: 24px;
     max-width: 560px;
-    font-size: clamp(1.0625rem, 1.5vw, 1.1875rem);
+    font-size: clamp(1.0625rem, 1.4vw, 1.1875rem);
     color: var(--fg-muted);
   }
   .ctas {
@@ -161,109 +169,153 @@ import { profile } from '../data/profile';
     gap: 10px;
     margin-top: 36px;
   }
+  .socials {
+    display: flex;
+    gap: 10px;
+  }
   .btn-icon {
-    width: 46px;
+    width: 44px;
     padding: 0;
   }
 
-  .portrait {
+  .visual {
     position: relative;
-    margin: 0;
     justify-self: end;
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
+  }
+  .portrait {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    border-radius: 28px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background:
+      radial-gradient(80% 60% at 30% 20%, color-mix(in oklab, var(--accent) 30%, transparent), transparent 70%),
+      radial-gradient(70% 60% at 90% 90%, color-mix(in oklab, var(--accent-2) 28%, transparent), transparent 70%),
+      var(--bg-muted);
+    box-shadow: var(--shadow-lg);
+  }
+  .portrait::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 28px 28px;
   }
   .portrait :global(img) {
-    width: 100%;
-    aspect-ratio: 4 / 5;
-    object-fit: cover;
-    object-position: center 20%;
-    border-radius: 24px;
-    box-shadow: var(--shadow-lg);
-    background: var(--bg-muted);
-  }
-  figcaption {
     position: absolute;
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
-    display: grid;
-    gap: 2px;
-    padding: 14px 16px;
-    border-radius: 16px;
-    background: color-mix(in oklab, var(--bg-elev) 82%, transparent);
+    left: 50%;
+    bottom: 0;
+    width: 104%;
+    max-width: none;
+    transform: translateX(-46%);
+  }
+  .float {
+    position: absolute;
+    border: 1px solid var(--border);
+    background: color-mix(in oklab, var(--bg-elev) 85%, transparent);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
-    font-size: 0.875rem;
+    box-shadow: var(--shadow-lg);
+    border-radius: 14px;
   }
-  figcaption span {
+  .code {
+    top: 3%;
+    left: -64px;
+    padding: 12px 16px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: var(--fg-muted);
+    animation: bob 6s ease-in-out infinite;
+  }
+  .code .k {
+    color: var(--accent-text);
+  }
+  .code .s {
+    color: var(--accent-2);
+  }
+  .loc {
+    right: -20px;
+    bottom: 36px;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    color: var(--fg-muted);
+    padding: 8px 12px;
     font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--fg-muted);
+    animation: bob 7s ease-in-out -2s infinite;
+  }
+  @keyframes bob {
+    50% {
+      transform: translateY(-6px);
+    }
   }
 
   .stats {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    margin: clamp(56px, 8vw, 96px) 0 0;
-    border-top: 1px solid var(--border);
+    gap: 12px;
+    margin: clamp(56px, 8vw, 88px) 0 0;
   }
   .stats > div {
     display: flex;
     flex-direction: column-reverse;
     justify-content: flex-end;
     gap: 6px;
-    padding: 24px 24px 0 0;
-  }
-  .stats > div + div {
-    padding-left: 24px;
-    border-left: 1px solid var(--border);
+    padding: 20px 22px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: color-mix(in oklab, var(--bg-elev) 80%, transparent);
   }
   .stats dd {
     margin: 0;
-    font-size: clamp(2.25rem, 4vw, 3rem);
-    line-height: 1;
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
   }
   .stats dt {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     color: var(--fg-muted);
-    max-width: 200px;
   }
 
-  @media (max-width: 860px) {
+  @media (max-width: 1100px) {
+    .code {
+      left: -24px;
+    }
+    .loc {
+      right: -8px;
+    }
+  }
+  @media (max-width: 900px) {
     .grid {
       grid-template-columns: 1fr;
     }
-    .portrait {
+    .visual {
       justify-self: start;
       max-width: 112px;
       order: -1;
-      margin-bottom: -12px;
+      margin-bottom: -8px;
     }
-    .portrait :global(img) {
+    .portrait {
       aspect-ratio: 1;
-      object-position: center 8%;
       border-radius: 50%;
       box-shadow: var(--shadow);
-      border: 1px solid var(--border);
     }
-    figcaption {
+    .portrait :global(img) {
+      width: 150%;
+      transform: translateX(-44%) translateY(30%);
+    }
+    .float {
       display: none;
     }
     .stats {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      column-gap: 24px;
-    }
-    .stats > div,
-    .stats > div + div {
-      padding: 20px 0 0;
-      border-left: 0;
-    }
-    .stats dd {
-      font-size: 2.25rem;
     }
   }
 </style>

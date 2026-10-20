@@ -7,8 +7,8 @@ import { profile, experience, education } from '../data/profile';
   <div class="container grid">
     <div class="about">
       <div class="section-head" data-reveal>
-        <span class="eyebrow">Experience</span>
-        <h2 id="exp-title">Ten years of <span class="serif">shipping</span> &amp; leading</h2>
+        <span class="eyebrow"><span class="num">02</span> Experience</span>
+        <h2 id="exp-title">Ten years of <span class="grad">shipping &amp; leading</span></h2>
       </div>
       <div class="about-copy" data-reveal>
         {profile.about.map((para) => <p>{para}</p>)}
@@ -58,7 +58,7 @@ import { profile, experience, education } from '../data/profile';
 
 <style>
   .alt {
-    background: var(--bg-elev);
+    background: var(--bg-sunken);
     border-block: 1px solid var(--border);
   }
   .grid {

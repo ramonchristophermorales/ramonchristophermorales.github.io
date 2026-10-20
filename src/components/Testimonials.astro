@@ -13,12 +13,12 @@ const initials = (name: string) =>
 <section class="section alt" id="testimonials" aria-labelledby="t-title">
   <div class="container">
     <div class="section-head" data-reveal>
-      <span class="eyebrow">Testimonials</span>
-      <h2 id="t-title">What clients <span class="serif">&amp;</span> colleagues say</h2>
+      <span class="eyebrow"><span class="num">04</span> Testimonials</span>
+      <h2 id="t-title">What clients &amp; colleagues <span class="grad">say</span></h2>
     </div>
 
     <figure class="lead" data-reveal>
-      <blockquote class="serif">“{lead.quote}”</blockquote>
+      <blockquote>“{lead.quote}”</blockquote>
       <figcaption>
         <span class="avatar" aria-hidden="true">{initials(lead.author)}</span>
         <span>
@@ -51,7 +51,7 @@ const initials = (name: string) =>
 
 <style>
   .alt {
-    background: var(--bg-elev);
+    background: var(--bg-sunken);
     border-block: 1px solid var(--border);
   }
   figure {

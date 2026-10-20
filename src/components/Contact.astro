@@ -8,8 +8,8 @@ const year = new Date().getFullYear();
 <section class="section" id="contact" aria-labelledby="contact-title">
   <div class="container">
     <div class="panel" data-reveal>
-      <span class="eyebrow">Contact</span>
-      <h2 id="contact-title">Have a project in mind? <span class="serif">Let’s talk.</span></h2>
+      <span class="eyebrow"><span class="num">05</span> Contact</span>
+      <h2 id="contact-title">Have a project in mind? <span class="grad">Let’s talk.</span></h2>
       <p>
         I’m available for freelance work and remote roles. Tell me what you’re building and where you need help.
       </p>
@@ -53,36 +53,52 @@ const year = new Date().getFullYear();
 </footer>
 
 <style>
+  /* Always-dark panel: tokens are swapped locally so it looks the same in both themes. */
   .panel {
+    --fg: #09090b;
+    --bg: #fafafa;
+    --accent: #818cf8;
+    --accent-2: #22d3ee;
+    --accent-text: #a5b4fc;
     position: relative;
     display: grid;
     justify-items: start;
     gap: 20px;
     padding: clamp(32px, 6vw, 72px);
     border-radius: 28px;
-    background: var(--fg);
+    background: #09090b;
     color: var(--bg);
+    border: 1px solid #1f1f24;
     overflow: hidden;
     isolation: isolate;
   }
   .panel::before {
     content: '';
     position: absolute;
-    inset: auto -20% -60% 30%;
-    height: 120%;
+    inset: 0;
     z-index: -1;
-    background: radial-gradient(closest-side, color-mix(in oklab, var(--accent) 55%, transparent), transparent);
-    opacity: 0.6;
+    background:
+      radial-gradient(45% 70% at 85% 100%, rgb(79 70 229 / 0.45), transparent 70%),
+      radial-gradient(35% 55% at 100% 20%, rgb(8 145 178 / 0.3), transparent 70%);
   }
-  .eyebrow {
-    color: color-mix(in oklab, var(--bg) 65%, transparent);
+  .panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(rgb(255 255 255 / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: linear-gradient(110deg, transparent 30%, #000);
+    -webkit-mask-image: linear-gradient(110deg, transparent 30%, #000);
+  }
+  .eyebrow :global(.num) {
+    color: #71717a;
   }
   h2 {
     font-size: clamp(2.25rem, 5.5vw, 4rem);
     max-width: 820px;
-  }
-  .serif {
-    font-style: italic;
   }
   p {
     max-width: 560px;

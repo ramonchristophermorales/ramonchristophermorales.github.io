@@ -17,7 +17,7 @@ npm run check     # type-check
 All content lives in [`src/data/profile.ts`](src/data/profile.ts): intro, projects, experience, skills, education and testimonials.
 
 - **Add a project:** drop screenshots in `src/assets/projects/`, import them at the top of `profile.ts`, and add an entry to `projects`. The first five show as cards (the first two are featured). The rest appear under "Earlier work".
-- **Portrait:** `src/assets/img/portrait.jpg`. It is also used for the social preview image.
+- **Portrait:** `src/assets/img/portrait.png` (transparent background). The social preview card is `src/assets/img/og.jpg` (1200×630).
 
 ## Structure
 

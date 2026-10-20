@@ -32,7 +32,7 @@ export const profile = {
     "I've worked on everything from small business tools to large-scale web platforms, and served as Scrum Master, Development Team Lead, Lead Developer and Senior Programmer along the way.",
     'I care about the whole lifecycle: understanding the problem, designing a solution that will scale, shipping it, and keeping it healthy long after launch. Clients keep working with me for years because I take ownership and deliver when deadlines are tight.',
   ],
-  email: 'ramonchristophermorales@gmail.com',
+  email: 'ramon@moralesprojects.com',
   links: {
     linkedin: 'https://www.linkedin.com/in/ramonchristophermorales/',
     github: 'https://github.com/ramonchristophermorales',

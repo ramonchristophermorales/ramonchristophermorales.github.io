@@ -1,3 +1,5 @@
+import './game';
+
 const root = document.documentElement;
 
 // Theme toggle: cycles light/dark, remembers the choice.
@@ -14,13 +16,7 @@ document.querySelector('[data-theme-toggle]')?.addEventListener('click', () => {
   } catch {}
 });
 
-// Header background once the page scrolls.
-const header = document.querySelector<HTMLElement>('[data-header]');
-const onScroll = () => header?.classList.toggle('is-scrolled', scrollY > 8);
-addEventListener('scroll', onScroll, { passive: true });
-onScroll();
-
-// Highlight the nav link for the section in view.
+// Highlight the level link for the section in view.
 const navLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-nav]')];
 const sections = navLinks
   .map((a) => document.querySelector<HTMLElement>(a.getAttribute('href')!))
@@ -36,11 +32,6 @@ const navObserver = new IntersectionObserver(
 );
 sections.forEach((s) => navObserver.observe(s));
 
-// Close the mobile menu after choosing a link.
-document.querySelectorAll('[data-close-menu]').forEach((a) =>
-  a.addEventListener('click', () => document.getElementById('mobile-nav')?.hidePopover?.()),
-);
-
 // Reveal on scroll.
 const revealObserver = new IntersectionObserver(
   (entries) => {
@@ -55,7 +46,7 @@ const revealObserver = new IntersectionObserver(
 );
 document.querySelectorAll('[data-reveal]').forEach((el) => revealObserver.observe(el));
 
-// Project dialogs.
+// Dialogs (projects, achievements).
 document.querySelectorAll<HTMLButtonElement>('[data-open]').forEach((btn) => {
   btn.addEventListener('click', () => {
     const dialog = document.getElementById(btn.dataset.open!) as HTMLDialogElement | null;
@@ -70,7 +61,7 @@ document.querySelectorAll<HTMLDialogElement>('dialog.modal').forEach((dialog) =>
     if (e.target === dialog) dialog.close();
   });
   dialog.addEventListener('close', () => {
-    // Return focus to the card that opened it.
+    // Return focus to the button that opened it.
     document.querySelector<HTMLElement>(`[data-open="${dialog.id}"]`)?.focus();
   });
 });
@@ -102,64 +93,13 @@ document.querySelectorAll<HTMLElement>('[data-gallery]').forEach((gallery) => {
   update();
 });
 
-// Hero code editor: types the highlighted code out, then leaves a blinking caret.
-// The full code is in the HTML, so it still shows without JS or with reduced motion.
-const typewriter = document.querySelector<HTMLElement>('[data-typewriter]');
-if (typewriter) {
-  const caret = document.createElement('span');
-  caret.className = 'caret';
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  if (reduce) {
-    typewriter.querySelector('code')?.append(caret);
-  } else {
-    // Lock the size so the card doesn't grow while typing.
-    typewriter.style.height = `${typewriter.offsetHeight}px`;
-
-    const walker = document.createTreeWalker(typewriter, NodeFilter.SHOW_TEXT);
-    const nodes: { node: Text; text: string; instant: boolean }[] = [];
-    while (walker.nextNode()) {
-      const node = walker.currentNode as Text;
-      nodes.push({ node, text: node.data, instant: !!node.parentElement?.closest('.ln') });
-      node.data = '';
-    }
-
-    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-    const type = async () => {
-      caret.classList.add('is-typing');
-      for (const { node, text, instant } of nodes) {
-        node.after(caret);
-        if (instant) {
-          node.data = text;
-          continue;
-        }
-        for (const ch of text) {
-          node.data += ch;
-          // Linger on line ends and punctuation so it feels like someone typing.
-          await sleep(ch === '\n' ? 180 : /[,{}()[\];]/.test(ch) ? 60 : 18 + Math.random() * 30);
-        }
-      }
-      caret.classList.remove('is-typing');
-    };
-
-    // Start once the hero is on screen (it usually is on load).
-    const io = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) {
-        io.disconnect();
-        setTimeout(type, 700);
-      }
-    });
-    io.observe(typewriter);
-  }
-}
-
 // Copy email.
 document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((btn) => {
   btn.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(btn.dataset.copy!);
-      btn.classList.add('is-done');
-      setTimeout(() => btn.classList.remove('is-done'), 2000);
+      btn.classList.add('is-copied');
+      setTimeout(() => btn.classList.remove('is-copied'), 2000);
     } catch {
       location.href = `mailto:${btn.dataset.copy}`;
     }

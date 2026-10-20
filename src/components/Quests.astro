@@ -1,0 +1,333 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { projects } from '../data/profile';
+import { points } from '../data/game';
+
+const host = (url: string) => new URL(url).hostname.replace(/^www\./, '');
+---
+
+<section class="section" id="quests" data-level="quests" aria-labelledby="quests-title">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <span class="eyebrow"><span class="num">Level 1</span> Quest log</span>
+      <h2 id="quests-title">Quests <span class="grad">completed</span></h2>
+      <p>Each one is a client product I built or maintained. Open a quest to read the story and claim +{points.quest}.</p>
+    </div>
+
+    <ul class="grid">
+      {
+        projects.map((p, i) => (
+          <li data-reveal style={`--delay: ${(i % 3) * 60}ms`}>
+            <button type="button" class="card" data-open={`project-${p.slug}`} data-collect={`quest:${p.slug}`} aria-haspopup="dialog">
+              <div class="thumb">
+                <Image src={p.images[0]} alt="" widths={[400, 600, 800]} sizes="(max-width: 760px) 100vw, (max-width: 1100px) 50vw, 370px" format="avif" />
+                <span class="xp">
+                  <span class="todo">+{points.quest}</span>
+                  <span class="done">✓ Cleared</span>
+                </span>
+              </div>
+              <div class="meta">
+                <div class="row">
+                  <span class="cat">{p.category}</span>
+                  <span class="date">{p.date}</span>
+                </div>
+                <h3>{p.name}</h3>
+                <p>{p.summary}</p>
+              </div>
+            </button>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  {
+    projects.map((p) => (
+      <dialog id={`project-${p.slug}`} class="modal" aria-labelledby={`project-${p.slug}-title`}>
+        <header class="modal-head">
+          <div>
+            <span class="cat">
+              {p.category} · {p.date}
+            </span>
+            <h3 id={`project-${p.slug}-title`}>{p.name}</h3>
+          </div>
+          <form method="dialog">
+            <button class="close" aria-label="Close">
+              <Icon name="x" />
+            </button>
+          </form>
+        </header>
+
+        <div class="gallery" data-gallery>
+          <div class="track" data-track>
+            {p.images.map((img, n) => (
+              <figure class="slide">
+                <Image
+                  src={img}
+                  alt={`${p.name} screenshot ${n + 1} of ${p.images.length}`}
+                  widths={[640, 1000, 1400]}
+                  sizes="(max-width: 960px) 100vw, 920px"
+                  format="avif"
+                  loading="lazy"
+                />
+              </figure>
+            ))}
+          </div>
+          {p.images.length > 1 && (
+            <div class="gallery-nav">
+              <button type="button" class="nav-btn" data-prev aria-label="Previous image">
+                <Icon name="chevron-left" />
+              </button>
+              <span class="counter" data-counter aria-live="polite">
+                1 / {p.images.length}
+              </span>
+              <button type="button" class="nav-btn" data-next aria-label="Next image">
+                <Icon name="chevron-right" />
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div class="modal-body">
+          <div class="prose">
+            <h4>Overview</h4>
+            <p>{p.summary}</p>
+            <h4>My role</h4>
+            <p>{p.role}</p>
+          </div>
+          <aside class="facts">
+            <div>
+              <h4>Stack</h4>
+              <ul class="tags">
+                {p.technologies.map((t) => (
+                  <li class="chip">{t}</li>
+                ))}
+              </ul>
+            </div>
+            {p.status && (
+              <div>
+                <h4>Status</h4>
+                <p>{p.status}</p>
+              </div>
+            )}
+            {p.url && (
+              <a href={p.url} class="btn btn-primary visit" target="_blank" rel="noopener">
+                Visit {host(p.url)} <Icon name="arrow-up-right" size={16} />
+              </a>
+            )}
+          </aside>
+        </div>
+      </dialog>
+    ))
+  }
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    text-align: left;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elev);
+    overflow: hidden;
+    transition:
+      transform 0.3s var(--ease),
+      box-shadow 0.3s var(--ease),
+      border-color 0.3s;
+  }
+  .card:hover {
+    transform: translate(-3px, -3px);
+    border-color: var(--fg);
+    box-shadow: 6px 6px 0 var(--accent);
+  }
+  .card:global(.is-done) {
+    border-color: color-mix(in oklab, var(--good) 40%, var(--border));
+  }
+  .thumb {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: var(--bg-muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .thumb :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    transition:
+      transform 0.8s var(--ease),
+      filter 0.4s;
+  }
+  .card:hover .thumb :global(img) {
+    transform: scale(1.035);
+  }
+  .thumb .xp {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    background: #09090b;
+    color: #fbbf24;
+    border-color: #09090b;
+  }
+  .card:global(.is-done) .thumb .xp {
+    background: #16a34a;
+    border-color: #16a34a;
+    color: #fff;
+  }
+  .meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    padding: 20px 20px 22px;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.8125rem;
+  }
+  .cat {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.8125rem;
+  }
+  .date {
+    color: var(--fg-subtle);
+  }
+  .meta h3 {
+    font-size: 1.3125rem;
+  }
+  .meta p {
+    color: var(--fg-muted);
+    font-size: 0.9375rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .gallery {
+    position: relative;
+    background: var(--bg-muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .track::-webkit-scrollbar {
+    display: none;
+  }
+  .slide {
+    flex: 0 0 100%;
+    margin: 0;
+    padding: clamp(12px, 3vw, 28px);
+    scroll-snap-align: center;
+    display: grid;
+    place-items: center;
+  }
+  .slide :global(img) {
+    max-height: 60vh;
+    width: auto;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .gallery-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 0 0 16px;
+  }
+  .nav-btn {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg-elev);
+  }
+  .nav-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .counter {
+    font-size: 0.8125rem;
+    color: var(--fg-muted);
+    font-variant-numeric: tabular-nums;
+    min-width: 48px;
+    text-align: center;
+  }
+  .modal-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 32px;
+    padding: 28px 24px 32px;
+  }
+  .modal-body h4 {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-subtle);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .prose p {
+    color: var(--fg-muted);
+  }
+  .prose p + h4 {
+    margin-top: 24px;
+  }
+  .facts {
+    display: grid;
+    align-content: start;
+    gap: 24px;
+  }
+  .facts p {
+    color: var(--fg-muted);
+    font-size: 0.9375rem;
+  }
+  .visit {
+    justify-self: start;
+  }
+
+  @media (max-width: 1000px) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 640px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    .modal-body {
+      grid-template-columns: 1fr;
+    }
+    .visit {
+      white-space: normal;
+      height: auto;
+      min-height: 46px;
+    }
+  }
+</style>

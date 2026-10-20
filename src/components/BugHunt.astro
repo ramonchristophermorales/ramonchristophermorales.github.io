@@ -1,0 +1,404 @@
+---
+const holes = Array.from({ length: 12 });
+---
+
+<section class="section" id="bughunt" data-level="bughunt" aria-labelledby="bughunt-title">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <span class="eyebrow"><span class="num">Level 2</span> Mini-game</span>
+      <h2 id="bughunt-title">Bug <span class="grad">Hunt</span></h2>
+      <p>
+        Bugs are popping up in production. Squash as many as you can in 30 seconds. Your best round is added to your
+        total score.
+      </p>
+    </div>
+
+    <div class="arena" data-bughunt data-reveal>
+      <div class="bh-hud pixel" aria-live="off">
+        <span>Time <b data-bh-time>30</b></span>
+        <span>Score <b data-bh-score>0</b></span>
+        <span>Combo <b data-bh-combo>×1</b></span>
+        <span>Best <b data-bh-best>0</b></span>
+      </div>
+      <div class="holes" tabindex="-1">
+        {holes.map(() => <div class="hole" />)}
+      </div>
+      <div class="overlay" data-bh-overlay>
+        <p class="pixel title" data-bh-title>Ready?</p>
+        <p class="msg" data-bh-msg>Click bugs before they escape. Five in a row doubles your points, ten triples them.</p>
+        <button type="button" class="btn btn-primary" data-bh-start><span class="pixel" data-bh-label>Start</span></button>
+      </div>
+    </div>
+
+    <ul class="legend">
+      <li><span class="ico bug" aria-hidden="true"></span> Bug <b>+10</b></li>
+      <li><span class="ico gold" aria-hidden="true"></span> Prod outage <b>+30</b></li>
+      <li><span class="ico feature" aria-hidden="true"></span> Feature, leave it <b class="bad">−25</b></li>
+    </ul>
+  </div>
+
+  <template data-bug-tpl>
+    <button type="button" class="critter">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <g class="bug-shape" fill="currentColor">
+          <rect x="11" y="4" width="2" height="4" /><rect x="19" y="4" width="2" height="4" />
+          <rect x="12" y="8" width="8" height="5" />
+          <rect x="9" y="13" width="14" height="13" rx="1" />
+          <rect x="4" y="14" width="5" height="2" /><rect x="23" y="14" width="5" height="2" />
+          <rect x="4" y="19" width="5" height="2" /><rect x="23" y="19" width="5" height="2" />
+          <rect x="4" y="24" width="5" height="2" /><rect x="23" y="24" width="5" height="2" />
+          <rect x="15" y="13" width="2" height="13" fill="rgb(0 0 0 / 0.25)" />
+        </g>
+        <path class="feature-shape" fill="currentColor" d="M16 3l3.2 8.6L28 13l-6.8 5.6L23.4 28 16 23l-7.4 5 2.2-9.4L4 13l8.8-1.4z" />
+      </svg>
+      <span class="tag"></span>
+    </button>
+  </template>
+</section>
+
+<script>
+  import { pop, submitBugScore, best } from '../scripts/game';
+
+  const arena = document.querySelector<HTMLElement>('[data-bughunt]');
+  const tpl = document.querySelector<HTMLTemplateElement>('[data-bug-tpl]');
+  if (arena && tpl) {
+    const stage: HTMLElement = arena;
+    const $ = (s: string) => arena.querySelector<HTMLElement>(s)!;
+    const holes = [...arena.querySelectorAll<HTMLElement>('.hole')];
+    const timeEl = $('[data-bh-time]');
+    const scoreEl = $('[data-bh-score]');
+    const comboEl = $('[data-bh-combo]');
+    const bestEl = $('[data-bh-best]');
+    const overlay = $('[data-bh-overlay]');
+    const title = $('[data-bh-title]');
+    const msg = $('[data-bh-msg]');
+    const label = $('[data-bh-label]');
+    const startBtn = $('[data-bh-start]') as HTMLButtonElement;
+
+    const ROUND = 30_000;
+    const names = ['N+1', 'null', 'CORS', '500', 'NaN', 'race', 'leak', 'off-by-1', 'undefined', 'deadlock', 'typo', 'timeout'];
+    let running = false;
+    let score = 0;
+    let streak = 0;
+    let t0 = 0;
+    let spawnId = 0;
+    let tickId = 0;
+
+    const mult = () => (streak >= 10 ? 3 : streak >= 5 ? 2 : 1);
+    const hud = () => {
+      scoreEl.textContent = String(score);
+      comboEl.textContent = `×${mult()}`;
+      stage.classList.toggle('is-hot', mult() > 1);
+    };
+    bestEl.textContent = String(best());
+
+    function spawn() {
+      if (!running) return;
+      // 0 → 1 over the round: bugs come faster and leave sooner.
+      const p = Math.min(1, (performance.now() - t0) / ROUND);
+      const free = holes.filter((h) => !h.firstElementChild);
+      if (free.length) {
+        const hole = free[Math.floor(Math.random() * free.length)];
+        const r = Math.random();
+        const kind = r < 0.14 ? 'feature' : r < 0.24 ? 'gold' : 'bug';
+        const name = kind === 'feature' ? 'feature' : names[Math.floor(Math.random() * names.length)];
+        const node = tpl!.content.firstElementChild!.cloneNode(true) as HTMLButtonElement;
+        node.classList.add(kind);
+        node.querySelector('.tag')!.textContent = name;
+        node.setAttribute('aria-label', kind === 'feature' ? 'Feature, do not squash' : `Squash bug: ${name}`);
+        hole.append(node);
+
+        const escape = setTimeout(() => {
+          if (kind !== 'feature') {
+            streak = 0;
+            hud();
+          }
+          node.classList.add('is-gone');
+          setTimeout(() => node.remove(), 200);
+        }, 1700 - 850 * p);
+
+        node.addEventListener('click', () => {
+          if (!running || node.classList.contains('is-hit') || node.classList.contains('is-gone')) return;
+          clearTimeout(escape);
+          node.classList.add('is-hit');
+          if (kind === 'feature') {
+            streak = 0;
+            score = Math.max(0, score - 25);
+            pop('−25', node, 'bad');
+          } else {
+            streak++;
+            const pts = (kind === 'gold' ? 30 : 10) * mult();
+            score += pts;
+            pop(`+${pts}`, node, kind === 'gold' ? 'gold' : undefined);
+          }
+          hud();
+          setTimeout(() => node.remove(), 260);
+        });
+      }
+      spawnId = window.setTimeout(spawn, 780 - 460 * p + Math.random() * 180);
+    }
+
+    function tick() {
+      const left = Math.max(0, ROUND - (performance.now() - t0));
+      timeEl.textContent = String(Math.ceil(left / 1000));
+      stage.classList.toggle('is-ending', left < 5000);
+      if (left <= 0) end();
+    }
+
+    function start() {
+      if (running) return;
+      score = 0;
+      streak = 0;
+      hud();
+      holes.forEach((h) => h.replaceChildren());
+      overlay.hidden = true;
+      stage.classList.add('is-running');
+      running = true;
+      t0 = performance.now();
+      tick();
+      tickId = window.setInterval(tick, 100);
+      spawn();
+      holes[0].closest<HTMLElement>('.holes')!.focus({ preventScroll: true });
+    }
+
+    function end() {
+      running = false;
+      clearInterval(tickId);
+      clearTimeout(spawnId);
+      holes.forEach((h) => h.replaceChildren());
+      stage.classList.remove('is-running', 'is-hot', 'is-ending');
+      const record = submitBugScore(score);
+      bestEl.textContent = String(best());
+      title.textContent = record ? 'New high score!' : 'Game over';
+      msg.textContent = record
+        ? `${score} points. Your total score went up.`
+        : `${score} points. Beat your best of ${best()} to raise your total score.`;
+      label.textContent = 'Play again';
+      overlay.hidden = false;
+      startBtn.focus({ preventScroll: true });
+    }
+
+    startBtn.addEventListener('click', start);
+  }
+</script>
+
+<style>
+  /* The arena is always a dark "screen", in both themes. */
+  .arena {
+    max-width: 880px;
+    position: relative;
+    padding: clamp(14px, 3vw, 24px);
+    border-radius: 20px;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgb(129 140 248 / 0.18), transparent 60%),
+      #0b0b12;
+    color: #fafafa;
+    border: 2px solid var(--fg);
+    box-shadow: 8px 8px 0 var(--accent);
+    overflow: hidden;
+    isolation: isolate;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+  .arena::after {
+    /* CRT scanlines */
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgb(255 255 255 / 0.03) 0 1px, transparent 1px 3px);
+  }
+  .bh-hud {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px 20px;
+    padding: 4px 4px 16px;
+    font-size: 0.5625rem;
+    color: #a1a1aa;
+  }
+  .bh-hud b {
+    margin-left: 6px;
+    font-weight: 400;
+    font-size: 0.875rem;
+    color: #fafafa;
+  }
+  .arena:global(.is-hot) [data-bh-combo] {
+    color: #fbbf24;
+  }
+  .arena:global(.is-ending) [data-bh-time] {
+    color: #f87171;
+    animation: blink 0.5s steps(2, jump-none) infinite;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0.3;
+    }
+  }
+  .holes {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(8px, 2vw, 16px);
+    outline: none;
+  }
+  .hole {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 10;
+    border-radius: 14px;
+    background: #15151f;
+    border: 1px solid #262636;
+    box-shadow: inset 0 -8px 0 rgb(0 0 0 / 0.35);
+  }
+  .hole :global(.critter) {
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    width: 100%;
+    height: 100%;
+    padding: 10% 0 0;
+    border: 0;
+    border-radius: 14px;
+    background: none;
+    color: #4ade80;
+    animation: rise 0.18s var(--ease);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hole :global(.critter svg) {
+    width: clamp(30px, 6vw, 52px);
+    height: auto;
+    image-rendering: pixelated;
+    transition: transform 0.15s;
+  }
+  .hole :global(.critter:hover svg) {
+    transform: scale(1.1);
+  }
+  .hole :global(.critter .tag) {
+    font-family: var(--font-mono);
+    font-size: clamp(0.625rem, 1.4vw, 0.75rem);
+    color: #d4d4d8;
+    white-space: nowrap;
+  }
+  .hole :global(.critter.bug) {
+    color: #a78bfa;
+  }
+  .hole :global(.critter.gold) {
+    color: #fbbf24;
+    filter: drop-shadow(0 0 10px rgb(251 191 36 / 0.5));
+  }
+  .hole :global(.critter.feature) {
+    color: #4ade80;
+  }
+  .hole :global(.critter .feature-shape),
+  .hole :global(.critter.feature .bug-shape) {
+    display: none;
+  }
+  .hole :global(.critter.feature .feature-shape) {
+    display: inline;
+  }
+  .hole :global(.critter.is-hit) {
+    animation: squash 0.26s forwards;
+  }
+  .hole :global(.critter.is-gone) {
+    animation: sink 0.2s forwards;
+  }
+  @keyframes rise {
+    from {
+      transform: translateY(40%);
+      opacity: 0;
+    }
+  }
+  @keyframes squash {
+    to {
+      transform: scale(1.3, 0.2);
+      opacity: 0;
+    }
+  }
+  @keyframes sink {
+    to {
+      transform: translateY(40%);
+      opacity: 0;
+    }
+  }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 16px;
+    padding: 24px;
+    text-align: center;
+    background: rgb(11 11 18 / 0.82);
+    backdrop-filter: blur(3px);
+  }
+  .overlay[hidden] {
+    display: none;
+  }
+  .title {
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    line-height: 1.4;
+    color: #fbbf24;
+  }
+  .msg {
+    max-width: 420px;
+    color: #d4d4d8;
+  }
+  .overlay .btn-primary {
+    --fg: #fafafa;
+    --bg: #09090b;
+    height: 52px;
+    padding-inline: 26px;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    margin-top: 20px;
+    font-size: 0.875rem;
+    color: var(--fg-muted);
+  }
+  .legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .legend b {
+    font-family: var(--font-pixel);
+    font-weight: 400;
+    font-size: 0.625rem;
+    color: var(--gold);
+  }
+  .legend b.bad {
+    color: var(--bad);
+  }
+  .ico {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+  .ico.bug {
+    background: #a78bfa;
+  }
+  .ico.gold {
+    background: #fbbf24;
+  }
+  .ico.feature {
+    background: #4ade80;
+  }
+
+  @media (max-width: 560px) {
+    .holes {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .hole {
+      aspect-ratio: 1;
+    }
+  }
+</style>

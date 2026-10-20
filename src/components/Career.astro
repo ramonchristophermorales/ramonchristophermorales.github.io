@@ -1,0 +1,258 @@
+---
+import Icon from './Icon.astro';
+import { experience, skills, certifications, education } from '../data/profile';
+import { points, slug } from '../data/game';
+---
+
+<section class="section" id="career" data-level="career" aria-labelledby="career-title">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <span class="eyebrow"><span class="num">Level 3</span> Career mode</span>
+      <h2 id="career-title">Stages cleared &amp; <span class="grad">skill tree</span></h2>
+      <p>Open each stage of my career (+{points.stage}) and unlock the skills I use every day (+{points.skill} each).</p>
+    </div>
+
+    <div class="cols">
+      <ol class="stages" data-reveal>
+        {
+          experience.map((job, i) => (
+            <li>
+              <details class="stage">
+                <summary data-collect={`stage:${slug(job.company)}`}>
+                  <span class="world pixel">{`${experience.length - i}-1`}</span>
+                  <span class="what">
+                    <span class="pos">{job.position}</span>
+                    <span class="co">
+                      {job.company} · {job.date}
+                    </span>
+                  </span>
+                  <span class="xp">
+                    <span class="todo">+{points.stage}</span>
+                    <span class="done">✓</span>
+                  </span>
+                </summary>
+                <div class="body">
+                  <p>{job.description}</p>
+                  <p class="place">
+                    <Icon name="pin" size={14} /> {job.place}
+                  </p>
+                  <ul class="tags">
+                    {job.skills.map((s) => (
+                      <li class="chip">{s}</li>
+                    ))}
+                  </ul>
+                </div>
+              </details>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="tree" data-reveal style="--delay: 80ms">
+        {
+          skills.map((group) => (
+            <div class="branch">
+              <h3>{group.title}</h3>
+              <ul>
+                {group.items.map((item) => (
+                  <li>
+                    <button type="button" class="skill" data-collect={`skill:${slug(item)}`}>
+                      <span class="lock" aria-hidden="true" />
+                      {item}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+        <div class="branch badges">
+          <h3>Badges</h3>
+          <ul>
+            {certifications.map((c) => (
+              <li class="cert">
+                <Icon name="award" size={14} /> {c}
+              </li>
+            ))}
+            {education.map((e) => (
+              <li class="cert">
+                <Icon name="cap" size={14} /> {e.degree}, {e.school}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(24px, 4vw, 48px);
+    align-items: start;
+  }
+  .stages {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .stage {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--bg-elev);
+    transition:
+      border-color 0.2s,
+      box-shadow 0.3s var(--ease);
+  }
+  .stage[open] {
+    border-color: var(--fg);
+    box-shadow: 4px 4px 0 var(--accent);
+  }
+  summary {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    cursor: pointer;
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  .world {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    font-size: 0.625rem;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+  summary:global(.is-done) .world {
+    background: var(--good);
+    color: #fff;
+  }
+  .what {
+    display: grid;
+    gap: 2px;
+  }
+  .pos {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .co {
+    font-size: 0.875rem;
+    color: var(--fg-muted);
+  }
+  .body {
+    display: grid;
+    gap: 12px;
+    padding: 0 18px 18px 76px;
+    color: var(--fg-muted);
+    font-size: 0.9375rem;
+  }
+  .place {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    color: var(--fg-subtle);
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tree {
+    display: grid;
+    gap: 24px;
+  }
+  .branch h3 {
+    font-family: var(--font-pixel);
+    font-weight: 400;
+    font-size: 0.5625rem;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: var(--fg-subtle);
+    margin-bottom: 12px;
+  }
+  .branch ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .skill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 36px;
+    padding-inline: 12px;
+    border-radius: 8px;
+    border: 1px dashed var(--border-strong);
+    background: transparent;
+    color: var(--fg-muted);
+    font-size: 0.875rem;
+    transition:
+      transform 0.2s var(--ease),
+      background-color 0.2s,
+      border-color 0.2s,
+      color 0.2s;
+  }
+  .skill:hover {
+    border-color: var(--accent);
+    color: var(--fg);
+    transform: translateY(-2px);
+  }
+  .lock {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--fg-subtle);
+  }
+  .skill:global(.is-done) {
+    border-style: solid;
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    font-weight: 500;
+    transform: none;
+    cursor: default;
+  }
+  .skill:global(.is-done) .lock {
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .badges ul {
+    display: grid;
+    gap: 8px;
+  }
+  .cert {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9375rem;
+    color: var(--fg-muted);
+  }
+  .cert :global(svg) {
+    flex: none;
+    color: var(--gold);
+  }
+
+  @media (max-width: 900px) {
+    .cols {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 480px) {
+    .body {
+      padding-left: 18px;
+    }
+  }
+</style>

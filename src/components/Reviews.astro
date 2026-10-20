@@ -1,0 +1,170 @@
+---
+import { testimonials } from '../data/profile';
+import { points } from '../data/game';
+
+const initials = (name: string) =>
+  name
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 2);
+---
+
+<section class="section" id="reviews" data-level="reviews" aria-labelledby="reviews-title">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <span class="eyebrow"><span class="num">Level 4</span> Party chat</span>
+      <h2 id="reviews-title">What my <span class="grad">party</span> says</h2>
+      <p>Clients and leads I’ve worked with. Read each message for +{points.review}.</p>
+    </div>
+
+    <div class="box" data-reviews data-reveal>
+      {
+        testimonials.map((t, i) => (
+          <figure class:list={['slide', { 'is-active': i === 0 }]} data-review={`review:${i}`}>
+            <div class="speaker">
+              <span class="avatar pixel" aria-hidden="true">
+                {initials(t.author)}
+              </span>
+              <figcaption>
+                <span class="who">{t.author}</span>
+                <span class="role">{t.position}</span>
+              </figcaption>
+            </div>
+            <blockquote>
+              <p>{t.quote}</p>
+            </blockquote>
+          </figure>
+        ))
+      }
+      <div class="controls">
+        <span class="count pixel" data-review-count>1/{testimonials.length}</span>
+        <button type="button" class="btn btn-primary next" data-review-next>
+          <span class="pixel">Next ▶</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { collect } from '../scripts/game';
+
+  const box = document.querySelector<HTMLElement>('[data-reviews]');
+  if (box) {
+    const slides = [...box.querySelectorAll<HTMLElement>('[data-review]')];
+    const count = box.querySelector<HTMLElement>('[data-review-count]')!;
+    const next = box.querySelector<HTMLButtonElement>('[data-review-next]')!;
+    let i = 0;
+    const show = (n: number) => {
+      i = (n + slides.length) % slides.length;
+      slides.forEach((s, j) => s.classList.toggle('is-active', j === i));
+      count.textContent = `${i + 1}/${slides.length}`;
+      collect(slides[i].dataset.review!, box.querySelector('.is-active .who'));
+    };
+    next.addEventListener('click', () => show(i + 1));
+
+    // The first message counts once the box is on screen.
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        io.disconnect();
+        show(0);
+      }
+    });
+    io.observe(box);
+  }
+</script>
+
+<style>
+  .box {
+    position: relative;
+    max-width: 880px;
+    padding: clamp(20px, 4vw, 36px);
+    border-radius: 18px;
+    border: 2px solid var(--fg);
+    background: var(--bg-elev);
+    box-shadow: 8px 8px 0 var(--accent-2);
+  }
+  .slide {
+    margin: 0;
+    display: grid;
+    gap: 20px;
+  }
+  :global(.js) .slide:not(.is-active) {
+    display: none;
+  }
+  :global(.js) .slide.is-active {
+    animation: appear 0.4s var(--ease);
+  }
+  @keyframes appear {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+  /* Without JS, every message is listed. */
+  .slide + .slide {
+    margin-top: 32px;
+  }
+  :global(.js) .slide + .slide {
+    margin-top: 0;
+  }
+  .speaker {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #4f46e5, #0891b2);
+    color: #fff;
+    font-size: 0.75rem;
+  }
+  figcaption {
+    display: grid;
+  }
+  .who {
+    font-weight: 600;
+  }
+  .role {
+    font-size: 0.875rem;
+    color: var(--fg-muted);
+  }
+  blockquote {
+    margin: 0;
+    font-size: clamp(1.0625rem, 2vw, 1.3125rem);
+    line-height: 1.55;
+    letter-spacing: -0.01em;
+    min-height: 6.2em;
+  }
+  blockquote p::before {
+    content: '“';
+  }
+  blockquote p::after {
+    content: '”';
+  }
+  .controls {
+    display: none;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  :global(.js) .controls {
+    display: flex;
+  }
+  .count {
+    font-size: 0.625rem;
+    color: var(--fg-subtle);
+  }
+  @media (max-width: 560px) {
+    blockquote {
+      min-height: 0;
+    }
+  }
+</style>

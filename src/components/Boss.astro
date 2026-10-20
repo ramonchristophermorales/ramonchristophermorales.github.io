@@ -1,0 +1,219 @@
+---
+import Icon from './Icon.astro';
+import { profile } from '../data/profile';
+import { points, achievements } from '../data/game';
+
+const year = new Date().getFullYear();
+---
+
+<section class="section" id="boss" data-level="boss" aria-labelledby="boss-title">
+  <div class="container">
+    <div class="panel" data-reveal>
+      <span class="eyebrow"><span class="num">Final level</span> Boss fight</span>
+      <h2 id="boss-title">Beat the boss: <span class="grad">hire me.</span></h2>
+      <p>
+        I’m available for freelance work and remote roles. Tell me what you’re building and where you need help. Reaching
+        out is worth +{points.contact}.
+      </p>
+
+      <dl class="result">
+        <div>
+          <dt class="pixel">Your score</dt>
+          <dd class="pixel" data-score>000000</dd>
+        </div>
+        <div>
+          <dt class="pixel">Rank</dt>
+          <dd data-rank>Intern</dd>
+        </div>
+        <div>
+          <dt class="pixel">Achievements</dt>
+          <dd><button type="button" class="ach-link" data-open="achievements"><span data-ach-count>0/{achievements.length}</span></button></dd>
+        </div>
+      </dl>
+
+      <div class="actions">
+        <a class="btn btn-primary big" href={`mailto:${profile.email}`} data-collect="contact">
+          <Icon name="mail" />
+          {profile.email}
+        </a>
+        <button class="btn copy" type="button" data-copy={profile.email} data-collect="contact">
+          <span class="when-idle"><Icon name="copy" /> Copy email</span>
+          <span class="when-done"><Icon name="check" /> Copied</span>
+        </button>
+      </div>
+
+      <ul class="links">
+        <li>
+          <a href={profile.links.linkedin} target="_blank" rel="noopener" data-collect="contact"
+            ><Icon name="linkedin" /> LinkedIn <Icon name="arrow-up-right" size={14} /></a
+          >
+        </li>
+        <li>
+          <a href={profile.links.github} target="_blank" rel="noopener" data-collect="contact"
+            ><Icon name="github" /> GitHub <Icon name="arrow-up-right" size={14} /></a
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container inner">
+    <p>© {year} {profile.name}</p>
+    <p class="pixel">Game over? <a href="#top">Continue ↑</a></p>
+  </div>
+</footer>
+
+<style>
+  /* Always-dark panel: tokens are swapped locally so it looks the same in both themes. */
+  .panel {
+    --fg: #fafafa;
+    --fg-muted: #a1a1aa;
+    --fg-subtle: #71717a;
+    --accent: #818cf8;
+    --accent-2: #22d3ee;
+    --accent-text: #a5b4fc;
+    --gold: #fbbf24;
+    position: relative;
+    display: grid;
+    justify-items: start;
+    gap: 22px;
+    padding: clamp(28px, 6vw, 64px);
+    border-radius: 24px;
+    background:
+      radial-gradient(ellipse at 100% 0%, rgb(34 211 238 / 0.16), transparent 55%),
+      radial-gradient(ellipse at 0% 100%, rgb(129 140 248 / 0.2), transparent 55%),
+      #09090b;
+    color: var(--fg);
+    border: 2px solid #09090b;
+    box-shadow: 8px 8px 0 #fbbf24;
+    overflow: hidden;
+  }
+  h2 {
+    font-size: clamp(2.125rem, 5vw, 3.5rem);
+  }
+  .panel > p {
+    max-width: 600px;
+    font-size: 1.0625rem;
+    color: var(--fg-muted);
+  }
+  .result {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 0;
+  }
+  .result div {
+    display: grid;
+    gap: 8px;
+    min-width: 150px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 1px solid #2e2e35;
+    background: rgb(255 255 255 / 0.03);
+  }
+  dt {
+    font-size: 0.5rem;
+    color: var(--fg-subtle);
+  }
+  dd {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--accent-text);
+  }
+  dd.pixel {
+    font-size: 1rem;
+    color: var(--gold);
+  }
+  .ach-link {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-weight: 600;
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .btn {
+    --bg-elev: #161619;
+    --bg-muted: #1f1f24;
+    --border-strong: #2e2e35;
+    color: var(--fg);
+  }
+  .btn-primary {
+    background: #fafafa;
+    color: #09090b;
+    border-color: #fafafa;
+  }
+  .btn-primary:hover {
+    background: #fafafa;
+    border-color: #fafafa;
+  }
+  .big {
+    height: 52px;
+    padding-inline: 22px;
+  }
+  .copy {
+    height: 52px;
+  }
+  .copy .when-done,
+  .copy:global(.is-copied) .when-idle {
+    display: none;
+  }
+  .copy:global(.is-copied) .when-done {
+    display: inline-flex;
+  }
+  .copy span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--fg-muted);
+    font-weight: 500;
+  }
+  .links a:hover {
+    color: var(--fg);
+  }
+
+  .footer {
+    padding-block: 32px 48px;
+    font-size: 0.875rem;
+    color: var(--fg-subtle);
+  }
+  .footer .inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .footer .pixel {
+    font-size: 0.5625rem;
+    line-height: 2;
+  }
+  .footer a {
+    color: var(--fg);
+  }
+  @media (max-width: 520px) {
+    .big {
+      white-space: normal;
+      height: auto;
+      min-height: 52px;
+    }
+  }
+</style>

@@ -1,0 +1,284 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import portrait from '../assets/img/portrait.png';
+import { profile } from '../data/profile';
+import { points } from '../data/game';
+
+const sheet = [
+  { label: 'XP', value: `${profile.stats[0].value} yrs`, note: 'shipping production software' },
+  { label: 'Quests', value: profile.stats[1].value, note: 'featured client products' },
+  { label: 'Map', value: profile.stats[2].value, note: 'continents of clients' },
+  { label: 'Guild', value: 'CSM · CSPO', note: 'Certified Scrum' },
+];
+---
+
+<section class="start" id="top">
+  <div class="backdrop" aria-hidden="true"></div>
+  <div class="container grid">
+    <div class="copy">
+      <p class="status" data-reveal>
+        <span class="dot" aria-hidden="true"></span>
+        {profile.availability}
+      </p>
+      <p class="eyebrow" data-reveal style="--delay: 40ms">Player 1 · {profile.role}</p>
+      <h1 data-reveal style="--delay: 80ms">{profile.name}</h1>
+      <p class="lede" data-reveal style="--delay: 120ms">{profile.intro}</p>
+      <div class="ctas" data-reveal style="--delay: 160ms">
+        <a href="#quests" class="btn btn-primary press" data-collect="start">
+          <span class="pixel blink">Press start</span>
+          <span class="xp"><span class="todo">+{points.start}</span><span class="done">✓</span></span>
+        </a>
+        <a href="#boss" class="btn">Skip to the boss</a>
+      </div>
+      <p class="hint" data-reveal style="--delay: 200ms">
+        Every project you open, bug you squash and skill you unlock adds to your score. See how high you can go.
+      </p>
+    </div>
+
+    <aside class="sheet" data-reveal style="--delay: 120ms" aria-label="Character sheet">
+      <div class="sheet-top">
+        <div class="portrait">
+          <Image
+            src={portrait}
+            alt={`Illustrated portrait of ${profile.name}`}
+            widths={[200, 300, 400]}
+            sizes="160px"
+            loading="eager"
+            fetchpriority="high"
+            format="webp"
+          />
+        </div>
+        <div>
+          <p class="pixel tag">{profile.shortName}</p>
+          <p class="cls">Full-stack · Lv 10+</p>
+          <p class="loc"><Icon name="pin" size={14} /> {profile.location}</p>
+          <div class="socials">
+            <a href={profile.links.linkedin} target="_blank" rel="noopener" aria-label="LinkedIn"><Icon name="linkedin" size={16} /></a>
+            <a href={profile.links.github} target="_blank" rel="noopener" aria-label="GitHub"><Icon name="github" size={16} /></a>
+          </div>
+        </div>
+      </div>
+      <dl class="stats">
+        {
+          sheet.map((s) => (
+            <div>
+              <dt class="pixel">{s.label}</dt>
+              <dd>
+                <strong>{s.value}</strong>
+                <span>{s.note}</span>
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .start {
+    position: relative;
+    padding-block: clamp(48px, 8vw, 104px) clamp(56px, 8vw, 96px);
+    overflow: hidden;
+  }
+  .backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: radial-gradient(ellipse at 60% 30%, #000 30%, transparent 75%);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(32px, 6vw, 72px);
+  }
+  .copy {
+    display: grid;
+    justify-items: start;
+    gap: 20px;
+  }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg-elev);
+    font-size: 0.8125rem;
+    color: var(--fg-muted);
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--good);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--good) 25%, transparent);
+  }
+  h1 {
+    font-size: clamp(2.5rem, 6.4vw, 4.75rem);
+  }
+  .lede {
+    max-width: 580px;
+    font-size: 1.125rem;
+    color: var(--fg-muted);
+  }
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .press {
+    height: 52px;
+    padding-inline: 22px;
+    gap: 14px;
+  }
+  .press .pixel {
+    font-size: 0.75rem;
+  }
+  .press .xp {
+    color: #fbbf24;
+    border-color: rgb(251 191 36 / 0.4);
+    background: rgb(251 191 36 / 0.12);
+  }
+  .ctas > .btn:not(.press) {
+    height: 52px;
+  }
+  .blink {
+    animation: blink 1.2s steps(2, jump-none) infinite;
+  }
+  .press:hover .blink,
+  .press:global(.is-done) .blink {
+    animation: none;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0.35;
+    }
+  }
+  .hint {
+    font-size: 0.875rem;
+    color: var(--fg-subtle);
+    max-width: 460px;
+  }
+
+  .sheet {
+    position: relative;
+    display: grid;
+    gap: 20px;
+    padding: 24px;
+    border-radius: var(--radius);
+    border: 2px solid var(--fg);
+    background: var(--bg-elev);
+    box-shadow: 8px 8px 0 var(--accent);
+  }
+  .sheet-top {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  .portrait {
+    flex: none;
+    width: 112px;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    background: linear-gradient(160deg, var(--accent-soft), var(--bg-muted));
+    border: 1px solid var(--border);
+  }
+  .portrait :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+  .tag {
+    font-size: 1rem;
+  }
+  .cls {
+    margin-top: 8px;
+    font-weight: 600;
+    color: var(--accent-text);
+  }
+  .loc {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    color: var(--fg-muted);
+  }
+  .socials {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .socials a {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    color: var(--fg-muted);
+  }
+  .socials a:hover {
+    color: var(--fg);
+    border-color: var(--border-strong);
+  }
+  .stats {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    border-top: 1px dashed var(--border-strong);
+    padding-top: 12px;
+  }
+  .stats div {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    align-items: baseline;
+    gap: 12px;
+    padding: 8px 0;
+  }
+  dt {
+    font-size: 0.5625rem;
+    color: var(--fg-subtle);
+  }
+  dd {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+  }
+  dd strong {
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  dd span {
+    font-size: 0.875rem;
+    color: var(--fg-muted);
+  }
+
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    .sheet {
+      max-width: 520px;
+      width: calc(100% - 8px);
+    }
+  }
+  @media (max-width: 420px) {
+    .portrait {
+      width: 88px;
+    }
+  }
+</style>

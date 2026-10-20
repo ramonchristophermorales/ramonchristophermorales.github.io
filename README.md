@@ -1,6 +1,6 @@
 # Ramon Christopher Morales — Portfolio
 
-A static portfolio built with [Astro](https://astro.build) and TypeScript. It has no server and no database. Pages are prerendered to HTML, and images are converted to AVIF at build time.
+A static, arcade-style portfolio built with [Astro](https://astro.build) and TypeScript. Visitors score points for exploring: opening projects, unlocking skills, reading reviews and playing the Bug Hunt mini-game. Score and achievements are kept in localStorage. It has no server and no database. Pages are prerendered to HTML, and images are converted to AVIF at build time.
 
 ## Develop
 
@@ -16,17 +16,18 @@ npm run check     # type-check
 
 All content lives in [`src/data/profile.ts`](src/data/profile.ts): intro, projects, experience, skills, education and testimonials.
 
-- **Add a project:** drop screenshots in `src/assets/projects/`, import them at the top of `profile.ts`, and add an entry to `projects`. The first five show as cards (the first two are featured). The rest appear under "Earlier work".
+- **Add a project:** drop screenshots in `src/assets/projects/`, import them at the top of `profile.ts`, and add an entry to `projects`. Every project is a quest card.
+- **Scoring:** points, achievements and ranks live in [`src/data/game.ts`](src/data/game.ts).
 - **Portrait:** `src/assets/img/portrait.png` (transparent background). The social preview card is `src/assets/img/og.jpg` (1200×630).
 
 ## Structure
 
 ```
 src/
-  components/   Header, Hero, Work, Experience, Skills, Testimonials, Contact, Icon
-  data/         profile.ts (all content)
+  components/   Hud, Start, Quests, BugHunt, Career, Reviews, Boss, Icon
+  data/         profile.ts (all content), game.ts (points, achievements, ranks)
   layouts/      Base.astro (SEO, Open Graph, JSON-LD, theme)
-  scripts/      site.ts (theme toggle, reveal, dialogs, gallery)
+  scripts/      site.ts (theme toggle, reveal, dialogs, gallery), game.ts (score, achievements)
   styles/       global.css (design tokens, light/dark)
 ```
 

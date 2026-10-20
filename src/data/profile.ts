@@ -36,8 +36,6 @@ export const profile = {
   links: {
     linkedin: 'https://www.linkedin.com/in/ramonchristophermorales/',
     github: 'https://github.com/ramonchristophermorales',
-    resume:
-      'https://github.com/ramonchristophermorales/portfolio-template/blob/master/src/assets/pdfs/Resume.pdf',
   },
   stats: [
     { value: '10+', label: 'Years shipping production software' },

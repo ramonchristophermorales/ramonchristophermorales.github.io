@@ -26,11 +26,15 @@ jobs:
       - run: npm ci
       - run: npm run check
       - name: Build
-        run: npm run build
+        # The <owner>.github.io repo is served from the root; any other repo from /<repo>/.
+        # For a custom domain, set SITE_URL to it and BASE_PATH to "/".
+        run: |
+          if [ "$REPO" = "$OWNER.github.io" ]; then export BASE_PATH=/; else export BASE_PATH="/$REPO"; fi
+          npm run build
         env:
-          SITE_URL: https://ramonchristophermorales.github.io
-          # Project pages live under /<repo>/. Change to "/" when using a custom domain.
-          BASE_PATH: /${{ github.event.repository.name }}
+          SITE_URL: https://${{ github.repository_owner }}.github.io
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

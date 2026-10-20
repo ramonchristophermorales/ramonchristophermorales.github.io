@@ -35,7 +35,7 @@ src/
 `.github/workflows/deploy.yml` builds and deploys to GitHub Pages on every push to `main`.
 
 1. In the repo, go to **Settings → Pages** and set **Source** to **GitHub Actions**.
-2. Push to `main`. The site is published at `https://ramonchristophermorales.github.io/portfolio-2/`.
+2. Push to `main`. In the `ramonchristophermorales.github.io` repo the site is served at `https://ramonchristophermorales.github.io/`. Any other repo name serves it at `/<repo>/`.
 
 **Custom domain:** add it under Settings → Pages. In the workflow, set `SITE_URL` to your domain and `BASE_PATH` to `/`.
 

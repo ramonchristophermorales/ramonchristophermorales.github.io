@@ -1,0 +1,269 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import portrait from '../assets/img/portrait.jpg';
+import { profile } from '../data/profile';
+---
+
+<section class="hero" id="top">
+  <div class="glow" aria-hidden="true"></div>
+  <div class="container grid">
+    <div class="copy">
+      <p class="status" data-reveal>
+        <span class="dot" aria-hidden="true"></span>
+        {profile.availability}
+      </p>
+      <h1 data-reveal style="--delay: 60ms">
+        {profile.role.split(' ').slice(0, -1).join(' ')}{' '}
+        <span class="serif accent">{profile.role.split(' ').at(-1)}</span>
+        <span class="sub">Laravel · Vue · TypeScript</span>
+      </h1>
+      <p class="lede" data-reveal style="--delay: 120ms">{profile.intro}</p>
+      <div class="ctas" data-reveal style="--delay: 180ms">
+        <a href="#work" class="btn btn-primary">
+          See selected work <Icon name="arrow-down" />
+        </a>
+        <a href={profile.links.resume} class="btn" target="_blank" rel="noopener">
+          <Icon name="file" /> Résumé
+        </a>
+        <a href={profile.links.linkedin} class="btn btn-icon" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <Icon name="linkedin" />
+        </a>
+        <a href={profile.links.github} class="btn btn-icon" target="_blank" rel="noopener" aria-label="GitHub">
+          <Icon name="github" />
+        </a>
+      </div>
+    </div>
+
+    <figure class="portrait" data-reveal style="--delay: 120ms">
+      <Image
+        src={portrait}
+        alt={`Portrait of ${profile.name}`}
+        widths={[360, 560, 800]}
+        sizes="(max-width: 860px) 70vw, 400px"
+        loading="eager"
+        fetchpriority="high"
+        format="avif"
+      />
+      <figcaption>
+        <strong>{profile.name}</strong>
+        <span><Icon name="pin" size={14} /> {profile.location}</span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="container">
+    <dl class="stats" data-reveal style="--delay: 240ms">
+      {
+        profile.stats.map((s) => (
+          <div>
+            <dt>{s.label}</dt>
+            <dd class="serif">{s.value}</dd>
+          </div>
+        ))
+      }
+      <div>
+        <dt>Certified ScrumMaster® & Product Owner</dt>
+        <dd class="serif">CSM · CSPO</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    padding-top: clamp(40px, 7vw, 96px);
+    padding-bottom: clamp(56px, 8vw, 96px);
+    isolation: isolate;
+  }
+  .glow {
+    position: absolute;
+    inset: -120px 0 auto 0;
+    height: 720px;
+    z-index: -1;
+    background:
+      radial-gradient(40% 50% at 78% 30%, color-mix(in oklab, var(--accent) 18%, transparent), transparent 70%),
+      radial-gradient(30% 40% at 12% 10%, color-mix(in oklab, var(--accent) 10%, transparent), transparent 70%);
+    pointer-events: none;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr);
+    gap: clamp(32px, 6vw, 80px);
+    align-items: center;
+  }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg-elev);
+    font-size: 0.8125rem;
+    color: var(--fg-muted);
+    margin-bottom: 28px;
+  }
+  .dot {
+    position: relative;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22a06b;
+  }
+  .dot::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: #22a06b;
+    opacity: 0.35;
+    animation: pulse 2.4s var(--ease) infinite;
+  }
+  @keyframes pulse {
+    0% {
+      transform: scale(0.6);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(1.6);
+      opacity: 0;
+    }
+  }
+  h1 {
+    font-size: clamp(2.75rem, 7.2vw, 5.5rem);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+  }
+  .accent {
+    font-style: italic;
+    color: var(--accent);
+    font-size: 1.08em;
+  }
+  .sub {
+    display: block;
+    margin-top: 18px;
+    font-size: clamp(1rem, 1.6vw, 1.25rem);
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--fg-muted);
+  }
+  .lede {
+    margin-top: 24px;
+    max-width: 560px;
+    font-size: clamp(1.0625rem, 1.5vw, 1.1875rem);
+    color: var(--fg-muted);
+  }
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 36px;
+  }
+  .btn-icon {
+    width: 46px;
+    padding: 0;
+  }
+
+  .portrait {
+    position: relative;
+    margin: 0;
+    justify-self: end;
+    width: 100%;
+    max-width: 400px;
+  }
+  .portrait :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: center 20%;
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+    background: var(--bg-muted);
+  }
+  figcaption {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    display: grid;
+    gap: 2px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: color-mix(in oklab, var(--bg-elev) 82%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+    font-size: 0.875rem;
+  }
+  figcaption span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--fg-muted);
+    font-size: 0.8125rem;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: clamp(56px, 8vw, 96px) 0 0;
+    border-top: 1px solid var(--border);
+  }
+  .stats > div {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    gap: 6px;
+    padding: 24px 24px 0 0;
+  }
+  .stats > div + div {
+    padding-left: 24px;
+    border-left: 1px solid var(--border);
+  }
+  .stats dd {
+    margin: 0;
+    font-size: clamp(2.25rem, 4vw, 3rem);
+    line-height: 1;
+  }
+  .stats dt {
+    font-size: 0.875rem;
+    color: var(--fg-muted);
+    max-width: 200px;
+  }
+
+  @media (max-width: 860px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    .portrait {
+      justify-self: start;
+      max-width: 112px;
+      order: -1;
+      margin-bottom: -12px;
+    }
+    .portrait :global(img) {
+      aspect-ratio: 1;
+      object-position: center 8%;
+      border-radius: 50%;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    figcaption {
+      display: none;
+    }
+    .stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 24px;
+    }
+    .stats > div,
+    .stats > div + div {
+      padding: 20px 0 0;
+      border-left: 0;
+    }
+    .stats dd {
+      font-size: 2.25rem;
+    }
+  }
+</style>

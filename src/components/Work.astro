@@ -1,0 +1,521 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { projects } from '../data/profile';
+
+const host = (url: string) => new URL(url).hostname.replace(/^www\./, '');
+const cards = projects.slice(0, 5);
+const earlier = projects.slice(5);
+---
+
+<section class="section" id="work" aria-labelledby="work-title">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <span class="eyebrow">Selected work</span>
+      <h2 id="work-title">Products I’ve built <span class="serif">&amp;</span> maintained</h2>
+      <p>A decade of client platforms — portals, e-commerce, assessment engines and internal tools. Select a project for the full story.</p>
+    </div>
+
+    <ul class="grid">
+      {
+        cards.map((p, i) => (
+          <li class:list={['card', { featured: i < 2 }]} data-reveal style={`--delay: ${(i % 3) * 60}ms`}>
+            <button type="button" class="card-btn" data-open={`project-${p.slug}`} aria-haspopup="dialog">
+              <div class="thumb">
+                <Image
+                  src={p.images[0]}
+                  alt=""
+                  widths={i < 2 ? [560, 840, 1120] : [400, 600, 800]}
+                  sizes={i < 2 ? '(max-width: 760px) 100vw, 560px' : '(max-width: 760px) 100vw, (max-width: 1100px) 50vw, 370px'}
+                  format="avif"
+                />
+                {p.images.length > 1 && <span class="count">{p.images.length} images</span>}
+              </div>
+              <div class="meta">
+                <div class="row">
+                  <span class="cat">{p.category}</span>
+                  <span class="date">{p.date}</span>
+                </div>
+                <h3>{p.name}</h3>
+                <p>{p.summary}</p>
+                <ul class="tags" aria-label="Technologies">
+                  {p.technologies.slice(0, 4).map((t) => <li class="chip">{t}</li>)}
+                </ul>
+                <span class="more">
+                  View project <Icon name="arrow-right" size={16} />
+                </span>
+              </div>
+            </button>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="earlier" data-reveal>
+      <h3 class="earlier-title">Earlier work</h3>
+      <ul>
+        {
+          earlier.map((p) => (
+            <li>
+              <button type="button" class="row-btn" data-open={`project-${p.slug}`} aria-haspopup="dialog">
+                <span class="row-name">{p.name}</span>
+                <span class="row-desc">{p.technologies.slice(0, 3).join(' · ')}</span>
+                <span class="row-date">{p.date}</span>
+                <Icon name="arrow-right" size={16} class="row-arrow" />
+              </button>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+
+  {
+    projects.map((p) => (
+      <dialog id={`project-${p.slug}`} class="modal" aria-labelledby={`project-${p.slug}-title`}>
+        <div class="modal-inner">
+          <header class="modal-head">
+            <div>
+              <span class="cat">
+                {p.category} · {p.date}
+              </span>
+              <h3 id={`project-${p.slug}-title`}>{p.name}</h3>
+            </div>
+            <form method="dialog">
+              <button class="close" aria-label="Close">
+                <Icon name="x" />
+              </button>
+            </form>
+          </header>
+
+          <div class="gallery" data-gallery>
+            <div class="track" data-track>
+              {p.images.map((img, n) => (
+                <figure class="slide">
+                  <Image
+                    src={img}
+                    alt={`${p.name} screenshot ${n + 1} of ${p.images.length}`}
+                    widths={[640, 1000, 1400]}
+                    sizes="(max-width: 960px) 100vw, 920px"
+                    format="avif"
+                    loading="lazy"
+                  />
+                </figure>
+              ))}
+            </div>
+            {p.images.length > 1 && (
+              <div class="gallery-nav">
+                <button type="button" class="nav-btn" data-prev aria-label="Previous image">
+                  <Icon name="chevron-left" />
+                </button>
+                <span class="counter" data-counter aria-live="polite">
+                  1 / {p.images.length}
+                </span>
+                <button type="button" class="nav-btn" data-next aria-label="Next image">
+                  <Icon name="chevron-right" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div class="modal-body">
+            <div class="prose">
+              <h4>Overview</h4>
+              <p>{p.summary}</p>
+              <h4>My role</h4>
+              <p>{p.role}</p>
+            </div>
+            <aside class="facts">
+              <div>
+                <h4>Stack</h4>
+                <ul class="tags">
+                  {p.technologies.map((t) => (
+                    <li class="chip">{t}</li>
+                  ))}
+                </ul>
+              </div>
+              {p.status && (
+                <div>
+                  <h4>Status</h4>
+                  <p>{p.status}</p>
+                </div>
+              )}
+              {p.url && (
+                <a href={p.url} class="btn btn-primary visit" target="_blank" rel="noopener">
+                  Visit {host(p.url)} <Icon name="arrow-up-right" size={16} />
+                </a>
+              )}
+            </aside>
+          </div>
+        </div>
+      </dialog>
+    ))
+  }
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .card {
+    grid-column: span 2;
+  }
+  .card.featured {
+    grid-column: span 3;
+  }
+  .card-btn {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    text-align: left;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elev);
+    overflow: hidden;
+    transition:
+      transform 0.4s var(--ease),
+      box-shadow 0.4s var(--ease),
+      border-color 0.3s;
+  }
+  .card-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--border-strong);
+  }
+  .thumb {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: var(--bg-muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .thumb :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    transition: transform 0.8s var(--ease);
+  }
+  .card-btn:hover .thumb :global(img) {
+    transform: scale(1.035);
+  }
+  .count {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #fff;
+    background: rgb(0 0 0 / 0.55);
+    backdrop-filter: blur(6px);
+  }
+  .meta {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+    padding: 22px 22px 24px;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.8125rem;
+  }
+  .cat {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.8125rem;
+  }
+  .date {
+    color: var(--fg-subtle);
+  }
+  .meta h3 {
+    font-size: 1.375rem;
+  }
+  .featured .meta h3 {
+    font-size: 1.75rem;
+  }
+  .meta p {
+    color: var(--fg-muted);
+    font-size: 0.9375rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .meta .tags {
+    margin-top: 4px;
+  }
+  .more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  .more :global(svg) {
+    transition: transform 0.3s var(--ease);
+  }
+  .card-btn:hover .more :global(svg) {
+    transform: translateX(4px);
+  }
+
+  /* Dialog */
+  .modal {
+    width: min(960px, calc(100% - 32px));
+    max-height: calc(100dvh - 48px);
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--bg-elev);
+    color: var(--fg);
+    box-shadow: var(--shadow-lg);
+    overscroll-behavior: contain;
+  }
+  .modal::backdrop {
+    background: rgb(10 10 12 / 0.55);
+    backdrop-filter: blur(4px);
+  }
+  .modal[open] {
+    animation: pop 0.35s var(--ease);
+  }
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+  }
+  .modal-head {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 24px;
+    background: color-mix(in oklab, var(--bg-elev) 90%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-head h3 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    margin-top: 4px;
+  }
+  .close {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .gallery {
+    position: relative;
+    background: var(--bg-muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .track::-webkit-scrollbar {
+    display: none;
+  }
+  .slide {
+    flex: 0 0 100%;
+    margin: 0;
+    padding: clamp(12px, 3vw, 28px);
+    scroll-snap-align: center;
+    display: grid;
+    place-items: center;
+  }
+  .slide :global(img) {
+    max-height: 60vh;
+    width: auto;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .gallery-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 0 0 16px;
+  }
+  .nav-btn {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg-elev);
+  }
+  .nav-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .counter {
+    font-size: 0.8125rem;
+    color: var(--fg-muted);
+    font-variant-numeric: tabular-nums;
+    min-width: 48px;
+    text-align: center;
+  }
+  .modal-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 32px;
+    padding: 28px 24px 32px;
+  }
+  .modal-body h4 {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-subtle);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .prose p {
+    color: var(--fg-muted);
+  }
+  .prose p + h4 {
+    margin-top: 24px;
+  }
+  .facts {
+    display: grid;
+    align-content: start;
+    gap: 24px;
+  }
+  .facts p {
+    color: var(--fg-muted);
+    font-size: 0.9375rem;
+  }
+  .visit {
+    justify-self: start;
+  }
+
+  .earlier {
+    margin-top: 56px;
+  }
+  .earlier-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-subtle);
+    margin-bottom: 8px;
+  }
+  .earlier ul {
+    border-top: 1px solid var(--border);
+  }
+  .row-btn {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.5fr) auto 20px;
+    align-items: center;
+    gap: 24px;
+    width: 100%;
+    padding: 20px 4px;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    transition:
+      padding 0.35s var(--ease),
+      background-color 0.2s;
+  }
+  .row-btn:hover {
+    padding-inline: 16px 8px;
+    background: var(--bg-elev);
+  }
+  .row-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .row-desc,
+  .row-date {
+    color: var(--fg-muted);
+    font-size: 0.875rem;
+  }
+  .row-btn :global(.row-arrow) {
+    color: var(--fg-subtle);
+    transition:
+      transform 0.3s var(--ease),
+      color 0.2s;
+  }
+  .row-btn:hover :global(.row-arrow) {
+    color: var(--fg);
+    transform: translateX(3px);
+  }
+
+  @media (max-width: 1100px) and (min-width: 761px) {
+    .card {
+      grid-column: span 3;
+    }
+    .card:last-child {
+      grid-column: span 6;
+    }
+    .card:last-child .card-btn {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .card:last-child .thumb {
+      aspect-ratio: auto;
+      height: 100%;
+      border-bottom: 0;
+      border-right: 1px solid var(--border);
+    }
+  }
+  @media (max-width: 760px) {
+    .row-btn {
+      grid-template-columns: minmax(0, 1fr) 20px;
+      gap: 4px 16px;
+    }
+    .row-name,
+    .row-desc,
+    .row-date {
+      grid-column: 1;
+    }
+    .row-btn :global(.row-arrow) {
+      grid-column: 2;
+      grid-row: 1 / span 3;
+    }
+  }
+  @media (max-width: 760px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    .card,
+    .card.featured {
+      grid-column: auto;
+    }
+    .modal-body {
+      grid-template-columns: 1fr;
+    }
+    .visit {
+      white-space: normal;
+      height: auto;
+      min-height: 46px;
+    }
+  }
+</style>

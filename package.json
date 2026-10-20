@@ -1,0 +1,31 @@
+{
+  "name": "portfolio-2",
+  "version": "1.0.0",
+  "description": "Portfolio of Ramon Christopher Morales",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ramonchristophermorales/portfolio-2.git"
+  },
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/ramonchristophermorales/portfolio-2/issues"
+  },
+  "homepage": "https://github.com/ramonchristophermorales/portfolio-2#readme",
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource/instrument-serif": "^5.3.0",
+    "astro": "^7.4.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.11",
+    "@types/node": "^26.6.5",
+    "typescript": "^6.0.3"
+  },
+  "private": true
+}

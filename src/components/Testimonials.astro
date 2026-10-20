@@ -1,0 +1,126 @@
+---
+import { testimonials } from '../data/profile';
+
+const [lead, ...rest] = testimonials;
+const initials = (name: string) =>
+  name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .slice(0, 2);
+---
+
+<section class="section alt" id="testimonials" aria-labelledby="t-title">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <span class="eyebrow">Testimonials</span>
+      <h2 id="t-title">What clients <span class="serif">&amp;</span> colleagues say</h2>
+    </div>
+
+    <figure class="lead" data-reveal>
+      <blockquote class="serif">“{lead.quote}”</blockquote>
+      <figcaption>
+        <span class="avatar" aria-hidden="true">{initials(lead.author)}</span>
+        <span>
+          <strong>{lead.author}</strong>
+          <span>{lead.position} · {lead.location}</span>
+        </span>
+      </figcaption>
+    </figure>
+
+    <div class="grid">
+      {
+        rest.map((t, i) => (
+          <figure class="card" data-reveal style={`--delay: ${(i % 2) * 80}ms`}>
+            <blockquote>“{t.quote}”</blockquote>
+            <figcaption>
+              <span class="avatar" aria-hidden="true">
+                {initials(t.author)}
+              </span>
+              <span>
+                <strong>{t.author}</strong>
+                <span>{t.position}</span>
+              </span>
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .alt {
+    background: var(--bg-elev);
+    border-block: 1px solid var(--border);
+  }
+  figure {
+    margin: 0;
+  }
+  .lead {
+    max-width: 920px;
+    margin-bottom: clamp(48px, 7vw, 80px);
+  }
+  .lead blockquote {
+    margin: 0;
+    font-size: clamp(1.625rem, 3.4vw, 2.5rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    text-wrap: pretty;
+  }
+  figcaption {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 28px;
+  }
+  figcaption > span:last-child {
+    display: grid;
+  }
+  figcaption strong {
+    font-weight: 600;
+  }
+  figcaption span span {
+    color: var(--fg-muted);
+    font-size: 0.875rem;
+  }
+  .avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 28px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .card blockquote {
+    margin: 0;
+    font-size: 1.0625rem;
+    color: var(--fg);
+  }
+  .card figcaption {
+    margin-top: 24px;
+  }
+  @media (max-width: 760px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

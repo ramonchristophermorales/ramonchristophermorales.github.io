@@ -1,0 +1,60 @@
+name: Build hostinger branch
+
+# Builds the site for ramon.moralesprojects.com and commits the output to the `hostinger` branch.
+# Hostinger has no Node, so the server only runs `git pull` on that branch.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hostinger
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build
+        run: npm run build
+        env:
+          SITE_URL: https://ramon.moralesprojects.com
+          BASE_PATH: /
+      - run: cp deploy/hostinger/.htaccess dist/.htaccess
+
+      - name: Commit build to the hostinger branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          remote="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Add a commit on top of the existing branch (no force-push), so `git pull` on the server always fast-forwards.
+          if git ls-remote --exit-code --heads "$remote" hostinger >/dev/null; then
+            git clone --depth 1 --branch hostinger "$remote" out
+          else
+            git init -q -b hostinger out
+            git -C out remote add origin "$remote"
+          fi
+
+          find out -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a dist/. out/
+
+          cd out
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to publish."
+          else
+            git commit -q -m "Build from ${GITHUB_SHA::7}"
+            git push origin hostinger
+          fi

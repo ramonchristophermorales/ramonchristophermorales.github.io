@@ -37,6 +37,16 @@ src/
 1. In the repo, go to **Settings → Pages** and set **Source** to **GitHub Actions**.
 2. Push to `main`. In the `ramonchristophermorales.github.io` repo the site is served at `https://ramonchristophermorales.github.io/`. Any other repo name serves it at `/<repo>/`.
 
+### Hostinger (ramon.moralesprojects.com)
+
+Hostinger has no Node, so `.github/workflows/hostinger.yml` builds the site on every push to `main` and commits the output (plus `deploy/hostinger/.htaccess`) to the **`hostinger`** branch. The branch contains only the finished website.
+
+The subdomain's web folder is a checkout of that branch. To update the live site, run this over SSH in that folder:
+
+```bash
+git pull
+```
+
 **Custom domain:** add it under Settings → Pages. In the workflow, set `SITE_URL` to your domain and `BASE_PATH` to `/`.
 
 The output in `dist/` is plain static files, so it also works on Cloudflare Pages, Netlify or Vercel. Use the build command `npm run build` and the output directory `dist`.
